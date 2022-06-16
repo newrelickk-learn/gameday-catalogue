@@ -37,5 +37,6 @@ ENV NEW_RELIC_METADATA_COMMIT=$COMMIT_SHA
 ENV NEW_RELIC_METADATA_HOGE=fuga
 ENV NEW_RELIC_METADATA_RELEASE_TAG=$RELEASE_TAG
 ENV NEW_RELIC_CODE_LEVEL_METRICS_ENABLED=true
+ENV NEW_RELIC_METADATA_REPOSITORY_URL=https://gitlab.sockshop.nrkk.technology/nru/catalogue.git
 
 CMD ["rails", "server", "--environment", "production"]
