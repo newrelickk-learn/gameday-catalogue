@@ -26,7 +26,7 @@ spec:
       containers:
       - env:
         - name: NEW_RELIC_APP_NAME
-          value: catalogue-nru
+          value: catalogue_nru
         - name: NEW_RELIC_LICENSE_KEY
           value: YOUR_NR_LICENSE_KEY
         - name: NEW_RELIC_DISTRIBUTED_TRACING_ENABLED
