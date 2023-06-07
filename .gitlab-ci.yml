@@ -64,3 +64,4 @@ deploy:
   only:
     - master
     - merge_requests
+    - schedules
