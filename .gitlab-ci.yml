@@ -113,7 +113,7 @@ deploy-for-schedule:
     - TAG=$(git describe --tags)
     - HASH=${CI_COMMIT_SHA}
     - sed -i "s/DESCRIPTION/${DESCRIPTION}/;s/TAG/${TAG}/;s/HASH/${HASH}/" scripts/change_tracking.query
-    - curl -X POST https://api.newrelic.com/graphql -H 'Content-Type: application/json' -H 'API-Key: '${NEW_RELIC_USER_KEY} --data @scripts/change_tracking.query
+    - ./scripts/change_tracking.sh ${NEW_RELIC_USER_KEY}
 
   only:
     - schedules
