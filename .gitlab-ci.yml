@@ -92,25 +92,25 @@ deploy:
     - master
     - merge_requests
 
-  deploy-for-schedule:
-    stage: deploy
-    image: dtzar/helm-kubectl:3.8.2
-    before_script:
-      - apk add --update py-pip
-      - pip install awscli
-    script:
-      - |
-        tag=$(git describe --tags | sed "s/\./-/g")
-        echo $tag
-      - sed -i "s/catalogue:latest/catalogue:${tag}/g" deployment.yaml
-      - sed -i "s/catalogue-nru/catalogue-nru-${tag}/g" deployment.yaml
-      - sed -i "s/YOUR_NR_LICENSE_KEY/${NEW_RELIC_LICENSE_KEY}/g" deployment.yaml
-      - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
-      - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
-      - kubectl apply -f deployment.yaml
-      - |
-        if [[ `kubectl -n sock-shop-nr get deploy catalogue-nru-${tag} --ignore-not-found | wc -l` -gt 0 ]]; then
-          kubectl -n sock-shop-nr rollout restart deploy catalogue-nru-${tag}
-        fi
-    only:
-      - schedules
+deploy-for-schedule:
+  stage: deploy
+  image: dtzar/helm-kubectl:3.8.2
+  before_script:
+    - apk add --update py-pip
+    - pip install awscli
+  script:
+    - |
+      tag=$(git describe --tags | sed "s/\./-/g")
+      echo $tag
+    - sed -i "s/catalogue:latest/catalogue:${tag}/g" deployment.yaml
+    - sed -i "s/catalogue-nru/catalogue-nru-${tag}/g" deployment.yaml
+    - sed -i "s/YOUR_NR_LICENSE_KEY/${NEW_RELIC_LICENSE_KEY}/g" deployment.yaml
+    - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
+    - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
+    - kubectl apply -f deployment.yaml
+    - |
+      if [[ `kubectl -n sock-shop-nr get deploy catalogue-nru-${tag} --ignore-not-found | wc -l` -gt 0 ]]; then
+        kubectl -n sock-shop-nr rollout restart deploy catalogue-nru-${tag}
+      fi
+  only:
+    - schedules
