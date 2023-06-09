@@ -33,7 +33,6 @@ docker-build:
     - docker push public.ecr.aws/g7c8o4c7/catalogue:${tag}
   # Run this job in a branch where a Dockerfile exists
   only:
-    - master
     - merge_requests
 
 docker-build-for-tag:
@@ -91,7 +90,6 @@ deploy:
         kubectl -n sock-shop-nr rollout restart deploy catalogue-nru-${tag}
       fi
   only:
-    - master
     - merge_requests
 
 deploy-for-schedule:
@@ -109,7 +107,7 @@ deploy-for-schedule:
     - sed -i "s/YOUR_NR_LICENSE_KEY/${NEW_RELIC_LICENSE_KEY}/g" deployment.yaml
     - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
     - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
-    - kubectl delete -f deployment.yaml
+    - kubectl delete --ignore-not-found=true -f deployment.yaml
     - kubectl apply -f deployment.yaml
   only:
     - schedules
