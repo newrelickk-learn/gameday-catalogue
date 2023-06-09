@@ -10,6 +10,9 @@ class SocksSelector
 
   def call
     @socks = [];
+    if !p @tags.instance_of?(Array)
+      raise "Please set an Array in @tags"
+    end
     if @tags.length > 0
       @socks = Sock.all.filter {
         |sock| @tags.find { |tag| tag == Tag.find(SockTag.find_by(sock_id: sock.sock_id).tag_id).name }
