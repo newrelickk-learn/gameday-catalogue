@@ -109,5 +109,11 @@ deploy-for-schedule:
     - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
     - kubectl delete --ignore-not-found=true -f deployment.yaml
     - kubectl apply -f deployment.yaml
+    - DESCRIPTION=$(git log  --pretty=format:%s | head -n 1)
+    - TAG=$(git describe --tags)
+    - HASH=${CI_COMMIT_SHA}
+    - sed -i "s/DESCRIPTION/${DESCRIPTION}/;s/TAG/${TAG}/;s/HASH/${HASH}/" scripts/change_tracking.query
+    - curl -X POST https://api.newrelic.com/graphql -H 'Content-Type: application/json' -H 'API-Key: '${NEW_RELIC_USER_KEY} -d @scripts/change_tracking.query
+
   only:
     - schedules
