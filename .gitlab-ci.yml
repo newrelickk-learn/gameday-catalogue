@@ -1,6 +1,6 @@
 stages:
- - build
- - deploy
+  - build
+  - deploy
 
 docker-build:
   # Use the official docker image.
@@ -36,6 +36,33 @@ docker-build:
     - master
     - merge_requests
 
+docker-build-for-tag:
+  # Use the official docker image.
+  image: docker:latest
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - apk add --update py-pip
+    - pip install awscli
+    - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/g7c8o4c7
+  # Default branch leaves tag empty (= latest tag)
+  # All other branches are tagged with the escaped branch name (commit ref slug)
+  script:
+    - |
+      tag=$(echo $CI_COMMIT_TAG | sed "s/\./-/g")
+    - docker build . --tag public.ecr.aws/g7c8o4c7/catalogue:${tag} --build-arg COMMIT_SHA=${CI_COMMIT_SHA}
+    - docker push public.ecr.aws/g7c8o4c7/catalogue:${tag}
+  # Run this job in a branch where a Dockerfile exists
+  only:
+    - tags
+
 deploy:
   stage: deploy
   image: dtzar/helm-kubectl:3.8.2
@@ -64,4 +91,26 @@ deploy:
   only:
     - master
     - merge_requests
-    - schedules
+
+  deploy-for-schedule:
+    stage: deploy
+    image: dtzar/helm-kubectl:3.8.2
+    before_script:
+      - apk add --update py-pip
+      - pip install awscli
+    script:
+      - |
+        tag=$(git describe --tags | sed "s/\./-/g")
+        echo $tag
+      - sed -i "s/catalogue:latest/catalogue:${tag}/g" deployment.yaml
+      - sed -i "s/catalogue-nru/catalogue-nru-${tag}/g" deployment.yaml
+      - sed -i "s/YOUR_NR_LICENSE_KEY/${NEW_RELIC_LICENSE_KEY}/g" deployment.yaml
+      - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
+      - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
+      - kubectl apply -f deployment.yaml
+      - |
+        if [[ `kubectl -n sock-shop-nr get deploy catalogue-nru-${tag} --ignore-not-found | wc -l` -gt 0 ]]; then
+          kubectl -n sock-shop-nr rollout restart deploy catalogue-nru-${tag}
+        fi
+    only:
+      - schedules
