@@ -1,3 +1,4 @@
+require 'new_relic/agent/method_tracer'
 class SocksSelector
   include Service
 
@@ -28,5 +29,10 @@ class SocksSelector
       "count": sock.count,
       "imageUrl": [sock.image_url_1, sock.image_url_2]
     } }
+  end
+
+  class << self
+    include ::NewRelic::Agent::MethodTracer
+    add_method_tracer :call, 'SocksSelector/call'
   end
 end
