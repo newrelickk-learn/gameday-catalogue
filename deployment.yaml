@@ -3,16 +3,16 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: catalogue
-  name: catalogue-nru
-  namespace: sock-shop-nr
+    name: catalogue-web
+  name: catalogue-web
+  namespace: catalogue
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      name: catalogue
+      name: catalogue-web
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -21,12 +21,12 @@ spec:
   template:
     metadata:
       labels:
-        name: catalogue
+        name: catalogue-web
     spec:
       containers:
       - env:
         - name: NEW_RELIC_APP_NAME
-          value: catalogue_nru
+          value: catalogue-web
         - name: NEW_RELIC_LICENSE_KEY
           value: YOUR_NR_LICENSE_KEY
         - name: NEW_RELIC_DISTRIBUTED_TRACING_ENABLED
@@ -53,7 +53,7 @@ spec:
           periodSeconds: 3
           successThreshold: 1
           timeoutSeconds: 300
-        name: catalogue
+        name: catalogue-web
         ports:
         - containerPort: 3000
           protocol: TCP

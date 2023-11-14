@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   get '/health' => 'health#index'
+  get '/search' => 'search#index'
   get '/catalogue' => 'catalogue#index'
   get '/catalogue/size' => 'catalogue#size'
   get '/catalogue/:sock_id' => 'catalogue#item'
