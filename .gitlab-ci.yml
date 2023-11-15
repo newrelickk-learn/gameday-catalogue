@@ -76,7 +76,6 @@ deploy:
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
     - sed -i "s/catalogue:latest/catalogue:${tag}/g" deployment.yaml
-    - sed -i "s/catalogue-nru/catalogue-nru-${tag}/g" deployment.yaml
     - sed -i "s/YOUR_NR_LICENSE_KEY/${NEW_RELIC_LICENSE_KEY}/g" deployment.yaml
     - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
     - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
@@ -99,11 +98,9 @@ deploy-for-schedule:
       tag=$(git describe --tags | sed "s/\./-/g")
       echo $tag
     - sed -i "s/catalogue:latest/catalogue:${tag}/g" deployment.yaml
-    - sed -i "s/catalogue-nru/catalogue-nru-scheduled/g" deployment.yaml
     - sed -i "s/YOUR_NR_LICENSE_KEY/${NEW_RELIC_LICENSE_KEY}/g" deployment.yaml
     - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
     - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
-    - kubectl delete --ignore-not-found=true -f deployment.yaml
     - kubectl apply -f deployment.yaml
     - DESCRIPTION=$(git log  --pretty=format:%s | head -n 1)
     - TAG=$(git describe --tags).$(date +%s)
