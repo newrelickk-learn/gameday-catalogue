@@ -30,7 +30,7 @@ RUN gem update --system
 RUN chmod 644 config/master.key
 RUN chown -R appuser:appuser /home/appuser/webapp
 USER 1000
-RUN bundle install
+RUN bundle install && bundle exec rails assets:precompile RAILS_ENV=production
 ARG COMMIT_SHA="sha"
 ARG RELEASE_TAG="dev"
 ENV NEW_RELIC_METADATA_COMMIT=$COMMIT_SHA
