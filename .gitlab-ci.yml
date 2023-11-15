@@ -110,7 +110,7 @@ deploy-for-schedule:
     - kubectl delete --ignore-not-found=true -f deployment.yaml
     - kubectl apply -f deployment.yaml
     - DESCRIPTION=$(git log  --pretty=format:%s | head -n 1)
-    - TAG=$(git describe --tags)
+    - TAG=$(git describe --tags).$(date +%s)
     - HASH=${CI_COMMIT_SHA}
     - sed -i "s/DESCRIPTION/${DESCRIPTION}/;s/TAG/${TAG}/;s/HASH/${HASH}/" scripts/change_tracking.query
     - ./scripts/change_tracking.sh ${NEW_RELIC_USER_KEY}
