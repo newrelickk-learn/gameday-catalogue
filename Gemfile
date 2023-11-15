@@ -58,5 +58,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'mysql2'
 gem 'newrelic_rpm', '<= 8.8.0'
 gem 'newrelic-infinite_tracing', '<= 8.8.0'
-gem "uglifier", "~> 4.2"
 gem 'puma-newrelic'
+
+gem "uglifier", "~> 4.2"

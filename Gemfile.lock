@@ -79,6 +79,7 @@ GEM
     concurrent-ruby (1.1.9)
     crass (1.0.6)
     erubi (1.10.0)
+    execjs (2.9.1)
     ffi (1.15.4)
     globalid (0.5.2)
       activesupport (>= 5.0)
@@ -252,7 +253,7 @@ DEPENDENCIES
   sqlite3 (~> 1.4)
   turbolinks (~> 5)
   tzinfo-data
-  uglifier
+  uglifier (~> 4.2)
   web-console (>= 4.1.0)
   webdrivers
   webpacker (~> 5.0)
