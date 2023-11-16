@@ -59,5 +59,6 @@ gem 'mysql2'
 gem 'newrelic_rpm', '<= 8.8.0'
 gem 'newrelic-infinite_tracing', '<= 8.8.0'
 gem 'puma-newrelic'
+gem "importmap-rails", "~> 1.2"
 
-gem "uglifier", "~> 4.2"
+gem "terser", "~> 1.1"
