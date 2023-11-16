@@ -6,7 +6,7 @@ docker-build:
   # Use the official docker image.
   image: docker:latest
   variables:
-    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://localhost:2375
     DOCKER_TLS_CERTDIR: ""
 
   stage: build
