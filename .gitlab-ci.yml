@@ -80,10 +80,6 @@ deploy:
     - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
     - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
     - kubectl apply -f deployment.yaml
-    - |
-      if [[ `kubectl -n sock-shop-nr get deploy catalogue-nru-${tag} --ignore-not-found | wc -l` -gt 0 ]]; then
-        kubectl -n sock-shop-nr rollout restart deploy catalogue-nru-${tag}
-      fi
   only:
     - merge_requests
 
