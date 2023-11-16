@@ -16,6 +16,7 @@ WORKDIR /home/appuser/webapp
 
 COPY ./app ./app
 COPY ./bin ./bin
+COPY ./vendor ./vendor
 COPY ./config ./config
 COPY ./db ./db
 COPY ./lib ./lib
