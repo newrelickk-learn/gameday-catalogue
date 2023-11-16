@@ -12,7 +12,9 @@ docker-build:
 
   stage: build
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["sh"]
+      entrypoint: ["/usr/local/bin/dockerd-entrypoint.sh"]
   before_script:
     - apk add --update py-pip
     - pip install awscli
