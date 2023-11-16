@@ -39,6 +39,8 @@ spec:
           value: catalogue-db
         - name: RAILS_LOG_TO_STDOUT
           value: "true"
+        - name: RAILS_SERVE_STATIC_FILES
+          value: "true"
         - name: RAILS_MAX_THREADS
           value: "20"
         image: public.ecr.aws/g7c8o4c7/catalogue:latest
