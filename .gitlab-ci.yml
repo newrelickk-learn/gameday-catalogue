@@ -90,8 +90,6 @@ deploy-for-schedule:
   stage: deploy
   image: dtzar/helm-kubectl:3.8.2
   before_script:
-    - apk add --update py-pip
-    - pip install awscli
     - git log  --pretty=format:%s | head -n 1
     - DESCRIPTION=$(git log  --pretty=format:%s | head -n 1)
     - echo ${DESCRIPTION}
@@ -99,6 +97,8 @@ deploy-for-schedule:
     - echo ${TAG}
     - HASH=${CI_COMMIT_SHA}
     - echo ${HASH}
+    - apk add --update py-pip
+    - pip install awscli
   script:
     - |
       tag=$(git describe --tags | sed "s/\./-/g")
