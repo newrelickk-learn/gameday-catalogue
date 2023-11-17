@@ -94,13 +94,11 @@ deploy-for-schedule:
     - pip install awscli
   script:
     - |
-      tag=$(git describe --tags | sed "s/\./-/g")
+      tag_raw=$(git describe --tags)
+      tag=$(echo ${tag_raw}| sed "s/\./-/g")
       echo $tag
-      git log  --pretty=format:%s | head -n 1
-      description=$(git log  --pretty=format:%s | head -n 1)
+      description=${CI_COMMIT_MESSAGE}
       echo ${description}
-      tag_dep=$(git describe --tags)
-      echo ${tag_dep}
       hash=${CI_COMMIT_SHA}
       echo ${hash}
     - sed -i "s/catalogue:latest/catalogue:${tag}/g" deployment.yaml
@@ -108,7 +106,7 @@ deploy-for-schedule:
     - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
     - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
     - kubectl apply -f deployment.yaml
-    - sed -i "s/DESCRIPTION/${description}/;s/TAG/${tag}/;s/HASH/${hash}/" scripts/change_tracking.query
+    - sed -i "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/" scripts/change_tracking.query
     - ./scripts/change_tracking.sh ${NEW_RELIC_USER_KEY}
 
   only:
