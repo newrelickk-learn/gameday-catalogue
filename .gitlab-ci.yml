@@ -47,6 +47,14 @@ docker-build-for-tag:
   services:
     - docker:dind
   before_script:
+    - git log  --pretty=format:%s | head -n 1
+    - description=$(git log  --pretty=format:%s | head -n 1)
+    - echo ${description}
+    - tag_dep=$(git describe --tags)
+    - echo ${tag_dep}
+    - hash=${CI_COMMIT_SHA}
+    - echo ${hash}
+
     - apk add --update py-pip
     - pip install awscli
     - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/g7c8o4c7
@@ -90,19 +98,19 @@ deploy-for-schedule:
   stage: deploy
   image: dtzar/helm-kubectl:3.8.2
   before_script:
-    - git log  --pretty=format:%s | head -n 1
-    - description=$(git log  --pretty=format:%s | head -n 1)
-    - echo ${description}
-    - tag_dep=$(git describe --tags)
-    - echo ${tag_dep}
-    - hash=${CI_COMMIT_SHA}
-    - echo ${hash}
     - apk add --update py-pip
     - pip install awscli
   script:
     - |
       tag=$(git describe --tags | sed "s/\./-/g")
       echo $tag
+      git log  --pretty=format:%s | head -n 1
+      description=$(git log  --pretty=format:%s | head -n 1)
+      echo ${description}
+      tag_dep=$(git describe --tags)
+      echo ${tag_dep}
+      hash=${CI_COMMIT_SHA}
+      echo ${hash}
     - sed -i "s/catalogue:latest/catalogue:${tag}/g" deployment.yaml
     - sed -i "s/YOUR_NR_LICENSE_KEY/${NEW_RELIC_LICENSE_KEY}/g" deployment.yaml
     - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
