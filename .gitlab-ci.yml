@@ -97,18 +97,16 @@ deploy-for-schedule:
       tag_raw=$(git describe --tags)
       tag=$(echo ${tag_raw}| sed "s/\./-/g")
       echo $tag
-      description=${CI_COMMIT_MESSAGE}
+      description=$(echo ${CI_COMMIT_MESSAGE}|sed "s|/|_|g")
       echo ${description}
       hash=${CI_COMMIT_SHA}
       echo ${hash}
-      project_url=https://gitlab.sockshop.nrkk.technology/GamedayBase/catalogue/-
-      deep_link=${project_url}/tags/${tag_raw}
-      change_log=${project_url}/blob/${tag_raw}/CHANGELOG.md
     - sed -i "s/catalogue:latest/catalogue:${tag}/g" deployment.yaml
     - sed -i "s/YOUR_NR_LICENSE_KEY/${NEW_RELIC_LICENSE_KEY}/g" deployment.yaml
     - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
     - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
     - kubectl apply -f deployment.yaml
+    - echo "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/;"
     - sed -i "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/;" scripts/change_tracking.query
     - ./scripts/change_tracking.sh ${NEW_RELIC_USER_KEY}
 
