@@ -92,6 +92,13 @@ deploy-for-schedule:
   before_script:
     - apk add --update py-pip
     - pip install awscli
+    - git log  --pretty=format:%s | head -n 1
+    - DESCRIPTION=$(git log  --pretty=format:%s | head -n 1)
+    - echo ${DESCRIPTION}
+    - TAG=$(git describe --tags)
+    - echo ${TAG}
+    - HASH=${CI_COMMIT_SHA}
+    - echo ${HASH}
   script:
     - |
       tag=$(git describe --tags | sed "s/\./-/g")
@@ -101,13 +108,6 @@ deploy-for-schedule:
     - sed -i "s/YOUR_TRACE_OBSERVER_HOST/${NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST}/g" deployment.yaml
     - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
     - kubectl apply -f deployment.yaml
-    - git log  --pretty=format:%s | head -n 1
-    - DESCRIPTION=$(git log  --pretty=format:%s | head -n 1)
-    - echo ${DESCRIPTION}
-    - TAG=$(git describe --tags)
-    - echo ${TAG}
-    - HASH=${CI_COMMIT_SHA}
-    - echo ${HASH}
     - sed -i "s/DESCRIPTION/${DESCRIPTION}/;s/TAG/${TAG}/;s/HASH/${HASH}/" scripts/change_tracking.query
     - ./scripts/change_tracking.sh ${NEW_RELIC_USER_KEY}
 
