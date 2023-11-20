@@ -28,12 +28,19 @@ function bindFunctions() {
 }
 async function makeSomeRequest () {
     const user = location.search.split(/(\?|&)/).find(p=>p.startsWith('user')) ?? ''
-    await fetch(`/catalogue/size?tags=blue,magic&${user}`)
+    try {
+        await fetch(`/catalogue/size?tags=blue,magic&${user}`)
+    } catch {}
     for(let i= 0; i < 2; i++) {
-        await fetch(`/catalogue?tags[]=blue&tags[]=magic&${user}`)
+        try {
+            await fetch(`/catalogue?tags[]=blue&tags[]=magic&${user}`)
+        } catch {}
     }
     for(let i= 0; i < 5; i++) {
-        await fetch(`/catalogue?tags=blue,magic&${user}`)
+        try {
+            await fetch(`/catalogue?tags=blue,magic&${user}`)
+        } catch {
+        }
     }
 }
 
