@@ -11,7 +11,7 @@ class CatalogueController < ApplicationController
   end
 
   def size
-    @tags = params[:tags]
+    @tags = (params[:tags] || "").split(",")
     @socks = SocksCounter.call(@tags)
     render json: { "size": @socks[:size] }
   end
