@@ -12,4 +12,4 @@ for i in `seq 1 100`; do
   fi;
   sleep 30;
 done
-#curl -X POST https://api.newrelic.com/graphql -H 'Content-Type: application/json' -H 'API-Key: '${NEW_RELIC_USER_KEY} --data @scripts/change_tracking.query
+curl -X POST https://api.newrelic.com/graphql -H 'Content-Type: application/json' -H 'API-Key: '${NEW_RELIC_USER_KEY} --data @scripts/change_tracking.query
