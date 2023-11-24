@@ -1,7 +1,7 @@
 class CatalogueController < ApplicationController
   skip_before_action :verify_authenticity_token
   def index
-    @tags = params[:tags]
+    @tags = (params[:tags] || "").split(",")
     @order = params[:order]
     @pageNum = (params[:page] || 1).to_i
     @pageSize = (params[:size] || 100).to_i
@@ -18,7 +18,7 @@ class CatalogueController < ApplicationController
 
   # 詳細画面が開かない問題対応中
   def item
-    @sock_id = (params[:tags] || "").split(",")
+    @sock_id = params[:sock_id]
     @sock = SockGetter.call(@sock_id)
     if @sock[:error]
       render json: @sock, status: :internal_server_error
