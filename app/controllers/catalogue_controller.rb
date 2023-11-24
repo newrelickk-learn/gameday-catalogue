@@ -11,14 +11,14 @@ class CatalogueController < ApplicationController
   end
 
   def size
-    @tags = params[:tags]
+    @tags = (params[:tags] || "").split(",")
     @socks = SocksCounter.call(@tags)
     render json: { "size": @socks[:size] }
   end
 
   # 詳細画面が開かない問題対応中
   def item
-    @sock_id = params[:sock_id]
+    @sock_id = (params[:tags] || "").split(",")
     @sock = SockGetter.call(@sock_id)
     if @sock[:error]
       render json: @sock, status: :internal_server_error
