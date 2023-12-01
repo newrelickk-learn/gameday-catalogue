@@ -60,6 +60,7 @@ docker-build-for-tag:
     - docker push public.ecr.aws/g7c8o4c7/catalogue:${tag}
     - docker run --rm -d --name work public.ecr.aws/g7c8o4c7/catalogue:${tag}
     - docker cp -a work:/home/appuser/webapp/public/packs/js .
+    - docker rm -f work
     - publish-sourcemap $(ls js/*.js.map) https://catalogue.demo.learn.nrkk.technology/packs/$(ls js/*.js) --apiKey=${NEW_RELIC_USER_KEY} --applicationId=1588888201 --repoUrl=https://gitlab.sockshop.nrkk.technology/GamedayBase/catalogue --buildCommit=${CI_COMMIT_SHA}
   # Run this job in a branch where a Dockerfile exists
   only:
