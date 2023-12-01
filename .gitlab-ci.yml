@@ -47,7 +47,7 @@ docker-build-for-tag:
   services:
     - docker:dind
   before_script:
-    - apk add --update py-pip nodejs
+    - apk add --update py-pip npm
     - pip install awscli
     - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/g7c8o4c7
     - npm install -g @newrelic/publish-sourcemap
