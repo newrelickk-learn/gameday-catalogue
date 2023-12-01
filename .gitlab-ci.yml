@@ -54,6 +54,7 @@ docker-build-for-tag:
     - apk add --update py-pip npm
     - pip install awscli
     - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/g7c8o4c7
+    - npm install -g @newrelic/publish-sourcemap
   # Default branch leaves tag empty (= latest tag)
   # All other branches are tagged with the escaped branch name (commit ref slug)
   script:
