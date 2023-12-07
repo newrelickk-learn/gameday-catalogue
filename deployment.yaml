@@ -23,6 +23,8 @@ spec:
       labels:
         name: catalogue-web
     spec:
+      hostPID: true
+      hostIPC: true
       containers:
       - env:
         - name: NEW_RELIC_APP_NAME
