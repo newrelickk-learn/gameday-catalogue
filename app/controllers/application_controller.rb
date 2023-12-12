@@ -8,6 +8,6 @@ class ApplicationController < ActionController::Base
 
     def tracking
         @userParam = params[:user]
-        ::NewRelic::Agent.add_custom_attributes({ user: params[:user] })
+        ::NewRelic::Agent.add_custom_attributes({ user: params[:user], processId: $$ })
     end
 end
