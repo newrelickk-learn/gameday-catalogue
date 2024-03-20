@@ -17,7 +17,7 @@ docker-build:
       entrypoint: ["/usr/local/bin/dockerd-entrypoint.sh"]
   before_script:
     - apk add --update py-pip
-    - pip install awscli
+    - pip install awscli --break-system-packages
     - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/g7c8o4c7
   # Default branch leaves tag empty (= latest tag)
   # All other branches are tagged with the escaped branch name (commit ref slug)
@@ -52,7 +52,7 @@ docker-build-for-tag:
     - docker:dind
   before_script:
     - apk add --update py-pip npm
-    - pip install awscli
+    - pip install awscli --break-system-packages
     - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/g7c8o4c7
     - npm install -g @newrelic/publish-sourcemap
   # Default branch leaves tag empty (= latest tag)
