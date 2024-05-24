@@ -56,8 +56,8 @@ gem 'nokogiri', ">= 1.8.2"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'mysql2'
-gem 'newrelic_rpm', '<= 8.10.1'
-gem 'newrelic-infinite_tracing', '<= 8.10.1'
+gem 'newrelic_rpm', '<= 9.9.0'
+gem 'newrelic-infinite_tracing', '<= 9.9.0'
 gem 'puma-newrelic'
 gem "importmap-rails", "~> 1.2"
 
