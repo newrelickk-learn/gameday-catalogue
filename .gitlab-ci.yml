@@ -12,6 +12,7 @@ new-relic-exporter:
  trigger:
    include:
      - local: new-relic-exporter.yml
+ when: always
 
 docker-build:
   # Use the official docker image.
