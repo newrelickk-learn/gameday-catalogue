@@ -1,0 +1,10 @@
+stages:
+- new-relic-exporter
+new-relic-exporter:
+ rules:
+   - when: always
+ image:
+   name: docker.io/dpacheconr/gitlab-exporter:1.0.0
+ stage: new-relic-exporter
+ script:
+   - echo "Done"

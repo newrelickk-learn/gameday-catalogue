@@ -1,6 +1,17 @@
 stages:
   - build
   - deploy
+  - new-relic-exporter
+
+new-relic-exporter:
+ stage: new-relic-exporter
+ inherit:
+   variables: true
+ variables:
+   CI_PARENT_PIPELINE: $CI_PIPELINE_ID
+ trigger:
+   include:
+     - local: new-relic-exporter.yml
 
 docker-build:
   # Use the official docker image.
