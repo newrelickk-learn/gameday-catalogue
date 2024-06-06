@@ -46,6 +46,7 @@ docker-build:
   # Run this job in a branch where a Dockerfile exists
   only:
     - merge_requests
+    - web
 
 docker-build-for-tag:
   # Use the official docker image.
