@@ -38,6 +38,8 @@ RUN gem update --system
 RUN chmod 644 config/master.key
 RUN chown -R appuser:appuser /home/appuser/webapp
 USER 1000
+RUN bundle config unset frozen
+RUN bundle update
 RUN bundle install
 RUN bundle exec rails assets:precompile RAILS_ENV=production
 ARG COMMIT_SHA="sha"

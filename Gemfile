@@ -62,3 +62,7 @@ gem 'puma-newrelic'
 gem "importmap-rails", "~> 1.2"
 
 gem "terser", "~> 1.1"
+
+gem 'aws-xray-sdk'
+gem 'oj', platform: :mri
+gem 'jrjackson', platform: :jruby
