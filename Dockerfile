@@ -50,4 +50,4 @@ ENV NEW_RELIC_METADATA_RELEASE_TAG=$RELEASE_TAG
 ENV NEW_RELIC_CODE_LEVEL_METRICS_ENABLED=true
 ENV NEW_RELIC_RULES_IGNORE_URL_REGEXES="health"
 
-CMD ["rails", "server", "--environment", "production"]
+CMD ["rails", "server", "--environment", "production", "--log-to-stdout"]
