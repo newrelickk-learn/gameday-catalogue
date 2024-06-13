@@ -63,6 +63,6 @@ gem "importmap-rails", "~> 1.2"
 
 gem "terser", "~> 1.1"
 
-gem 'aws-xray-sdk'
+gem 'aws-xray-sdk', require: ['aws-xray-sdk/facets/rails/railtie']
 gem 'oj', platform: :mri
 gem 'jrjackson', platform: :jruby
