@@ -19,7 +19,7 @@ while read line; do
   if [[ "$i" -gt "0" ]]; then
     echo -n "," >> $REQUEST_FILE
   fi
-  echo -n '{"eventType":"DevOps4KeysLeadTime","committedAt":'$committedAt',"deployedAt":'$now',"duration":'$((now - committedAt))',"hash":"'$hash'","contributor":"'$user'", "comment":"'$comment'", "tag": "'$latestTag'"}' >> $REQUEST_FILE
+  echo -n '{"eventType":"DevOps4KeysLeadTime","committedAt":'$committedAt',"deployedAt":'$now',"duration":'$((now - committedAt))',"hash":"'$hash'","contributor":"'$user'", "comment":"'$comment'", "version": "'$latestTag'"}' >> $REQUEST_FILE
   i=$((i+1))
 done < "/tmp/releaseCommits.csv"
 echo -n "]" >> $REQUEST_FILE
