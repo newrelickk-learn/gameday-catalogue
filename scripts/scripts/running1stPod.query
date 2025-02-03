@@ -1,0 +1,1 @@
+{ "query":  "{actor {account(id: 4097184) {nrql(query: \"SELECT count(*) FROM InfrastructureEvent  WHERE `event.metadata.namespace` = 'catalogue' AND event.message like 'Successfully assigned catalogue/catalogue-web%' SINCE 3 MINUTES AGO\" ) { results }}}}"}

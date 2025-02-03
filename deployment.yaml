@@ -31,8 +31,6 @@ spec:
           value: YOUR_NR_LICENSE_KEY
         - name: NEW_RELIC_DISTRIBUTED_TRACING_ENABLED
           value: "true"
-        - name: NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST
-          value: YOUR_TRACE_OBSERVER_HOST
         - name: NEW_RELIC_CODE_LEVEL_METRICS_ENABLED
           value: "true"
         - name: NEW_RELIC_BROWSER_MONITORING_ATTRIBUTES_ENABLED
@@ -43,8 +41,6 @@ spec:
           value: "true"
         - name: RAILS_SERVE_STATIC_FILES
           value: "true"
-        - name: RAILS_MAX_THREADS
-          value: "20"
         image: public.ecr.aws/g7c8o4c7/catalogue:latest
         imagePullPolicy: Always
         livenessProbe:
