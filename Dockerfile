@@ -32,7 +32,7 @@ COPY ./Rakefile ./
 COPY ./package.json ./
 COPY ./yarn.lock ./
 
-COPY Gemfile ./
+COPY Gemfile Gemfile.lock ./
 RUN mkdir -p tmp/pids
 
 USER root
