@@ -1,14 +1,14 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.0.2'
+ruby '3.1.6'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
-gem 'rails', '~> 6.1.4', '>= 6.1.4.1'
+gem 'rails', '~> 6.1.7', '>= 6.1.7.10'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.4'
 # Use Puma as the app server
-gem 'puma', '~> 5.0'
+gem 'puma', '~> 5.6.7'
 # Use SCSS for stylesheetsv
 gem 'sass-rails', '>= 6'
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
@@ -56,9 +56,9 @@ gem 'nokogiri', ">= 1.8.2"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'mysql2'
-gem 'newrelic_rpm', '<= 8.8.0'
-gem 'newrelic-infinite_tracing', '<= 8.8.0'
+gem 'newrelic_rpm', '<= 9.16.1'
 gem 'puma-newrelic'
 gem "importmap-rails", "~> 1.2"
 
 gem "terser", "~> 1.1"
+gem 'concurrent-ruby', '1.3.4'

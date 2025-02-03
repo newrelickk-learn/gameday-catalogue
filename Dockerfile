@@ -1,13 +1,15 @@
-FROM ruby:3.0.2
+FROM ruby:3.1.6
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
     apt-get -y update && apt-get install -y yarn nodejs
+
+ENV NODE_OPTIONS=--openssl-legacy-provider
 # throw errors if Gemfile has been modified since Gemfile.lock
 RUN useradd -u 1000 -m -s /bin/bash appuser
 USER 1000
 RUN gem uninstall bundler
-RUN gem install bundler --version '2.2.22'
+RUN gem install bundler --version '2.6.2'
 RUN bundle config --global frozen 1
 
 RUN mkdir /home/appuser/webapp
@@ -30,7 +32,7 @@ COPY ./Rakefile ./
 COPY ./package.json ./
 COPY ./yarn.lock ./
 
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile ./
 RUN mkdir -p tmp/pids
 
 USER root
