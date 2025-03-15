@@ -1,4 +1,7 @@
 require 'new_relic/agent/method_tracer'
+require 'net/http'
+
+
 class SocksSelector
   include Service
 
@@ -13,12 +16,17 @@ class SocksSelector
     @socks = [];
     if @tags.length > 0
       @socks = Sock.joins(sock_tags: :tag).where(tag: { name: @tags.map { |tag| tag.strip! ? tag.strip! : tag }}).distinct
-    else
+    elseadfasdfasdfasdfad
       @socks = Sock.all
     end
     if !@pageSize.nil?
       @socks = @socks.slice((@pageNum - 1) * @pageSize.to_i, @pageSize) || []
     end
+    uri = URI.parse('https://link.nrug.nrkk.technology')
+    http_client = Net::HTTP.new(uri.host,uri.port)
+    get_request = Net::HTTP::Get.new("/files/contents.json", 'Content-Type' => 'application/json')
+    http_client.use_ssl = true
+    http_client.request(get_request)
     return @socks.map { |sock| {
       "id": sock.sock_id,
       "name": sock.name,
