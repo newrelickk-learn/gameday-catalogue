@@ -5,7 +5,7 @@ metadata:
   name: newrelic-secret
   namespace: catalogue
 type: Opaque
-data:
+stringData:
   license-key: YOUR_NR_LICENSE_KEY
 ---
 apiVersion: apps/v1
