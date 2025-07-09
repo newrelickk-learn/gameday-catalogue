@@ -3,6 +3,9 @@ name: Development Build
 on:
   schedule:
     - cron: '50 0 * * *'
+    - cron: '50 5 * * *'
+    - cron: '50 12 * * *'
+    - cron: '50 17 * * *'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
