@@ -6,7 +6,7 @@
 #
 default: &default
   adapter: sqlite3
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  pool: 5
   timeout: 5000
 
 development:
@@ -14,7 +14,7 @@ development:
   encoding: utf8
   reconnect: true
   database: socksdb
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  pool: 5
   username: catalogue_user
   password: default_password
   host: 0.0.0.0
@@ -32,7 +32,7 @@ production:
   encoding: utf8
   reconnect: true
   database: socksdb
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  pool: 5
   username: catalogue_user
   password: default_password
   host: <%= ENV['DB_HOST'] %>
