@@ -76,12 +76,18 @@ jobs:
       if: github.ref_type == 'tag'
       run: npm install -g @newrelic/publish-sourcemap
 
+    - name: Install crictl
+      if: github.ref_type == 'tag'
+      run: |
+        curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.28.0/crictl-v1.28.0-linux-amd64.tar.gz | tar -xz
+        sudo mv crictl /usr/local/bin/
+
     - name: Extract sourcemaps and publish to New Relic
       if: github.ref_type == 'tag'
       run: |
-        nerdctl run --rm -d --name work_${{ steps.tag.outputs.tag }} ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
-        nerdctl cp work_${{ steps.tag.outputs.tag }}:/home/appuser/webapp/public/packs/js .
-        nerdctl rm -f work_${{ steps.tag.outputs.tag }}
+        container_id=$(crictl run --rm -d ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }})
+        crictl cp ${container_id}:/home/appuser/webapp/public/packs/js .
+        crictl rm -f ${container_id}
         publish-sourcemap $(ls js/*.js.map) https://catalogue.demo.learn.nrkk.technology/packs/$(ls js/*.js) \
           --apiKey=${{ secrets.NEW_RELIC_USER_KEY }} \
           --applicationId=1588888201 \
