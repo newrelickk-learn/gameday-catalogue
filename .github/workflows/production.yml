@@ -81,13 +81,40 @@ jobs:
       run: |
         curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.28.0/crictl-v1.28.0-linux-amd64.tar.gz | tar -xz
         sudo mv crictl /usr/local/bin/
+        sudo mkdir -p /etc/crictl
+        echo 'runtime-endpoint: unix:///run/containerd/containerd.sock' | sudo tee /etc/crictl/crictl.yaml
 
     - name: Extract sourcemaps and publish to New Relic
       if: github.ref_type == 'tag'
       run: |
-        container_id=$(crictl run --rm -d ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }})
-        crictl cp ${container_id}:/home/appuser/webapp/public/packs/js .
-        crictl rm -f ${container_id}
+        pod_config=$(mktemp)
+        cat > ${pod_config} << EOF
+        metadata:
+          name: sourcemap-extractor
+        spec:
+          containers:
+          - name: app
+            image: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+            command: ["sleep", "300"]
+        EOF
+        pod_id=$(crictl runp ${pod_config})
+        container_config=$(mktemp)
+        cat > ${container_config} << EOF
+        metadata:
+          name: app
+        image:
+          image: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        command: ["sleep", "300"]
+        EOF
+        container_id=$(crictl create ${pod_id} ${container_config} ${pod_config})
+        crictl start ${container_id}
+        crictl exec ${container_id} tar -czf /tmp/js.tar.gz -C /home/appuser/webapp/public/packs js
+        crictl exec ${container_id} cat /tmp/js.tar.gz > js.tar.gz
+        tar -xzf js.tar.gz
+        crictl stop ${container_id}
+        crictl rm ${container_id}
+        crictl stopp ${pod_id}
+        crictl rmp ${pod_id}
         publish-sourcemap $(ls js/*.js.map) https://catalogue.demo.learn.nrkk.technology/packs/$(ls js/*.js) \
           --apiKey=${{ secrets.NEW_RELIC_USER_KEY }} \
           --applicationId=1588888201 \
