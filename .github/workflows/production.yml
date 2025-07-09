@@ -98,7 +98,7 @@ jobs:
 
     - name: Update kubeconfig
       if: github.ref_type == 'tag'
-      run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ vars.EKS_CLUSTER_NAME }}
+      run: aws eks update-kubeconfig --name Socks --region ap-northeast-1
 
     - name: Extract sourcemaps and publish to New Relic
       if: github.ref_type == 'tag'
