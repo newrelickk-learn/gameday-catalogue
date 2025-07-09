@@ -1,0 +1,148 @@
+name: Production Deploy
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: public.ecr.aws/g7c8o4c7
+  IMAGE_NAME: catalogue
+
+jobs:
+  build:
+    runs-on: ${{ vars.RUNNER_LABELS || 'ubuntu-latest' }}
+    outputs:
+      image-tag: ${{ steps.tag.outputs.tag }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        driver: kubernetes
+        driver-opts: |
+          namespace=github-new
+          replicas=1
+          "rootless=true"
+        platforms: linux/amd64
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR Public
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        registry-type: public
+
+    - name: Set image tag
+      id: tag
+      run: |
+        if [[ "${{ github.ref_type }}" == "tag" ]]; then
+          tag=$(echo ${{ github.ref_name }} | sed "s/\./-/g")
+        else
+          tag="latest"
+        fi
+        echo "tag=${tag}" >> $GITHUB_OUTPUT
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        build-args: |
+          COMMIT_SHA=${{ github.sha }}
+          RELEASE_TAG=${{ github.ref_name }}
+        network: host
+
+    - name: Setup Node.js
+      if: github.ref_type == 'tag'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install New Relic CLI
+      if: github.ref_type == 'tag'
+      run: npm install -g @newrelic/publish-sourcemap
+
+    - name: Extract sourcemaps and publish to New Relic
+      if: github.ref_type == 'tag'
+      run: |
+        nerdctl run --rm -d --name work_${{ steps.tag.outputs.tag }} ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        nerdctl cp work_${{ steps.tag.outputs.tag }}:/home/appuser/webapp/public/packs/js .
+        nerdctl rm -f work_${{ steps.tag.outputs.tag }}
+        publish-sourcemap $(ls js/*.js.map) https://catalogue.demo.learn.nrkk.technology/packs/$(ls js/*.js) \
+          --apiKey=${{ secrets.NEW_RELIC_USER_KEY }} \
+          --applicationId=1588888201 \
+          --repoUrl=${{ github.server_url }}/${{ github.repository }} \
+          --buildCommit=${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: ${{ vars.RUNNER_LABELS || 'ubuntu-latest' }}
+    if: ${{ vars.ENABLE_DEPLOY == 'true' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: kubernetes
+          driver-opts: |
+            namespace=github-new
+            replicas=1
+            "rootless=true"
+          platforms: linux/amd64
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR Public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name Socks --region ap-northeast-1
+
+      - name: Deploy to Kubernetes
+        run: |
+          tag="${{ needs.build.outputs.image-tag }}"
+          sed -i "s/catalogue:latest/catalogue:${tag}/g" deployment.yaml
+          sed -i "s/YOUR_NR_LICENSE_KEY/${{ secrets.NEW_RELIC_LICENSE_KEY }}/g" deployment.yaml
+          sed -i "s/YOUR_TRACE_OBSERVER_HOST/${{ secrets.NEW_RELIC_INFINITE_TRACING_TRACE_OBSERVER_HOST }}/g" deployment.yaml
+          kubectl apply -f deployment.yaml
+
+      - name: Track deployment in New Relic
+        if: github.ref_type == 'tag'
+        run: |
+          tag_raw="${{ github.ref_name }}"
+          tag="${{ needs.build.outputs.image-tag }}"
+          description=$(echo "${{ github.event.head_commit.message }}" | sed "s|/|_|g")
+          hash="${{ github.sha }}"
+          sed -i "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/;s/ENTITY_GUID/${{ secrets.ENTITY_GUID }}/" scripts/change_tracking.query
+          ./scripts/change_tracking.sh ${{ secrets.NEW_RELIC_USER_KEY }}
