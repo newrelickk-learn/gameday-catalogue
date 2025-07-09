@@ -88,12 +88,9 @@ jobs:
       with:
         version: 'v1.28.0'
 
-    - name: Configure kubeconfig for EKS
+    - name: Update kubeconfig
       if: github.ref_type == 'tag'
-      uses: aws-actions/amazon-eks-update-kubeconfig-action@v1
-      with:
-        cluster-name: Socks
-        aws-region: ap-northeast-1
+      run: aws eks update-kubeconfig --name Socks --region ap-northeast-1
 
     - name: Extract sourcemaps and publish to New Relic
       if: github.ref_type == 'tag'
@@ -154,11 +151,8 @@ jobs:
         with:
           version: 'v1.28.0'
 
-      - name: Configure kubeconfig for EKS
-        uses: aws-actions/amazon-eks-update-kubeconfig-action@v1
-        with:
-          cluster-name: Socks
-          aws-region: ap-northeast-1
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name Socks --region ap-northeast-1
 
       - name: Deploy to Kubernetes
         run: |
