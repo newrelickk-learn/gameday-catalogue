@@ -1,0 +1,59 @@
+name: Development Build
+
+on:
+  pull_request:
+    branches: [ master ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: public.ecr.aws/g7c8o4c7
+  IMAGE_NAME: catalogue
+
+jobs:
+  build:
+    runs-on: ${{ vars.RUNNER_LABELS || 'ubuntu-latest' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        driver: kubernetes
+        driver-opts: |
+          namespace=github-new
+          replicas=1
+          "rootless=true"
+        platforms: linux/amd64
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR Public
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        registry-type: public
+
+    - name: Set image tag
+      id: tag
+      run: |
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          echo "tag=latest" >> $GITHUB_OUTPUT
+        else
+          echo "tag=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+        build-args: |
+          COMMIT_SHA=${{ github.sha }}
+        network: host
