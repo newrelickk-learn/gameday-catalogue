@@ -48,7 +48,7 @@ spec:
         - name: NEW_RELIC_BROWSER_MONITORING_ATTRIBUTES_ENABLED
           value: "true"
         - name: DB_HOST
-          value: catalogue-db
+          value: catalogue-db.catalogue.svc.cluster.local
         - name: RAILS_LOG_TO_STDOUT
           value: "true"
         - name: RAILS_SERVE_STATIC_FILES
