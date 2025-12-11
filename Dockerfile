@@ -1,8 +1,9 @@
 FROM ruby:3.1.6
 
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
-    apt-get -y update && apt-get install -y yarn nodejs
+# Install Node.js and Yarn using NodeSource repository (more reliable)
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
+    apt-get install -y nodejs &&\
+    npm install -g yarn
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
 # throw errors if Gemfile has been modified since Gemfile.lock
@@ -40,6 +41,8 @@ RUN gem update --system
 RUN chmod 644 config/master.key
 RUN chown -R appuser:appuser /home/appuser/webapp
 USER 1000
+# Add current platform if needed (for local development)
+RUN if [ "$(uname -m)" = "aarch64" ]; then bundle lock --add-platform aarch64-linux; fi
 RUN bundle install
 RUN bundle exec rails assets:precompile RAILS_ENV=production
 ARG COMMIT_SHA="sha"
