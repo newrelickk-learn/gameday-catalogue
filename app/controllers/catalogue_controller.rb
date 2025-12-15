@@ -26,4 +26,13 @@ class CatalogueController < ApplicationController
       render json: @sock
     end
   end
+
+  class << self
+    include ::NewRelic::Agent::MethodTracer
+    add_method_tracer :index, 'Custom/catalogue#index'
+    add_method_tracer :size, 'Custom/catalogue#size'
+    add_method_tracer :item, 'Custom/catalogue#item'
+  end
+
+  
 end

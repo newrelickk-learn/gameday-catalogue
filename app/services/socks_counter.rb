@@ -1,6 +1,7 @@
+require 'new_relic/agent/method_tracer'
 class SocksCounter
   include Service
-  include ::NewRelic::Agent::Instrumentation::ControllerInstrumentation
+  include ::NewRelic::Agent::MethodTracer
 
   def initialize(tags)
     @tags = tags
@@ -32,6 +33,6 @@ class SocksCounter
   end
   
   # メソッドをトレース対象として追加
-  add_transaction_tracer :call, name: 'SocksCounter#call'
+  add_method_tracer :call, 'call'
 
 end
