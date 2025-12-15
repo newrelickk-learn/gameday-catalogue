@@ -34,5 +34,4 @@ class CatalogueController < ApplicationController
     add_method_tracer :item, 'Custom/catalogue#item'
   end
 
-  
 end
