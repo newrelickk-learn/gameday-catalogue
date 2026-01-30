@@ -14,7 +14,9 @@ class SocksSelector
   def call
     @socks = [];
     if @tags.length > 0
-      @socks = Sock.joins(sock_tags: :tag).where(tag: { name: @tags.map { |tag| tag.strip! ? tag.strip! : tag }}).distinct
+      @socks = Sock.all.filter {
+       |sock| @tags.find { |tag| tag == Tag.find(SockTag.find_by(sock_id: sock.sock_id).tag_id).name }
+     }
     else
       @socks = Sock.all
     end
@@ -22,10 +24,10 @@ class SocksSelector
       @socks = @socks.slice((@pageNum - 1) * @pageSize.to_i, @pageSize) || []
     end
     uri = URI.parse('https://link.nrug.nrkk.technology')
-    http_client = Net::HTTP.new(uri.host,uri.port)
-    get_request = Net::HTTP::Get.new("/files/contents.json", 'Content-Type' => 'application/json')
-    http_client.use_ssl = true
-    http_client.request(get_request)
+    Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+      get_request = Net::HTTP::Get.new("/files/contents.json", 'Content-Type' => 'application/json')
+      http.request(get_request)
+    end
     return @socks.map { |sock| {
       "id": sock.sock_id,
       "name": sock.name,
