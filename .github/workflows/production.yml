@@ -93,7 +93,7 @@ jobs:
     - name: Extract sourcemaps and publish to New Relic
       if: github.ref_type == 'tag'
       run: |
-        kubectl run sourcemap-extractor --image=${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} --command -- sleep 300
+        kubectl get pod sourcemap-extractor > /dev/null 2>&1 || kubectl run sourcemap-extractor --image=${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} --command -- sleep 300
         kubectl wait --for=condition=ready pod/sourcemap-extractor --timeout=60s
         kubectl exec sourcemap-extractor -- tar -czf /tmp/js.tar.gz -C /home/appuser/webapp/public/packs js
         kubectl cp sourcemap-extractor:/tmp/js.tar.gz ./js.tar.gz
