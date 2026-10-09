@@ -165,5 +165,5 @@ jobs:
           tag="${{ needs.build.outputs.image-tag }}"
           description=$(echo "${{ github.event.head_commit.message }}" | sed "s|/|_|g")
           hash="${{ github.sha }}"
-          sed -i "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/;s/ENTITY_GUID/${{ secrets.ENTITY_GUID }}/" scripts/change_tracking.query
-          ./scripts/change_tracking.sh ${{ secrets.NEW_RELIC_USER_KEY }}
+          sed -i "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/" scripts/change_tracking.query
+          ./scripts/change_tracking.sh ${{ secrets.NEW_RELIC_USER_KEY }} ${{ vars.NEW_RELIC_REGION || 'US' }} ${{ vars.APP_NAME || 'catalogue' }}

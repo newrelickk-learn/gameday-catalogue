@@ -115,8 +115,8 @@ deploy-for-schedule:
     - mkdir -p ~/.kube; cat ${KUBE_CONFIG} > /root/.kube/config
     - kubectl apply -f deployment.yaml
     - echo "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/;"
-    - sed -i "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/;s/ENTITY_GUID/${ENTITY_GUID}/" scripts/change_tracking.query
-    - ./scripts/change_tracking.sh ${NEW_RELIC_USER_KEY}
+    - sed -i "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/" scripts/change_tracking.query
+    - ./scripts/change_tracking.sh ${NEW_RELIC_USER_KEY} ${NEW_RELIC_REGION:-US} ${APP_NAME:-catalogue}
 
   only:
     - schedules

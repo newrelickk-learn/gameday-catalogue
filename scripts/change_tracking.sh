@@ -1,5 +1,13 @@
 #!/bin/bash
+# usage: change_tracking.sh <USER_KEY> [REGION: US|JP] [APP_NAME]
 NEW_RELIC_USER_KEY=${1:-KEY}
+NEW_RELIC_REGION=$(echo "${2:-${NEW_RELIC_REGION:-US}}" | tr '[:lower:]' '[:upper:]')
+APP_NAME=${3:-${APP_NAME:-catalogue}}
+case "${NEW_RELIC_REGION}" in
+  US) NERDGRAPH_URL=https://api.newrelic.com/graphql ;;
+  JP) NERDGRAPH_URL=https://api.jp.newrelic.com/graphql ;;
+  *) echo "Unknown region: ${NEW_RELIC_REGION} (use US or JP)"; exit 1 ;;
+esac
 NAMESPACE=catalogue
 DEPLOYMENT_LABEL=catalogue-web
 IMAGE=$(grep -m1 'image:' deployment.yaml | sed 's/.*image: *//')
@@ -18,4 +26,6 @@ for i in `seq 1 100`; do
   sleep 30;
 done
 
-curl -X POST https://api.newrelic.com/graphql -H 'Content-Type: application/json' -H 'API-Key: '${NEW_RELIC_USER_KEY} --data @scripts/change_tracking.query
+sed -i.bak "s/APP_NAME/${APP_NAME}/" scripts/change_tracking.query && rm -f scripts/change_tracking.query.bak
+
+curl -X POST ${NERDGRAPH_URL} -H 'Content-Type: application/json' -H 'API-Key: '${NEW_RELIC_USER_KEY} --data @scripts/change_tracking.query
