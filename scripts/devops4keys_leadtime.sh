@@ -1,4 +1,11 @@
 #!/bin/bash
+# usage: devops4keys_leadtime.sh [REGION: US|JP]
+NEW_RELIC_REGION=$(echo "${1:-${NEW_RELIC_REGION:-US}}" | tr '[:lower:]' '[:upper:]')
+case "${NEW_RELIC_REGION}" in
+  US) EVENTS_HOST=insights-collector.newrelic.com ;;
+  JP) EVENTS_HOST=insights-collector.jp.nr-data.net ;;
+  *) echo "Unknown region: ${NEW_RELIC_REGION} (use US or JP)"; exit 1 ;;
+esac
 
 latestTag=$(git describe --tags --abbrev=0)
 prevTag=$(git describe --tags $(git rev-list --tags --max-count=10) | grep -v "-" | head -n 2 | tail -n 1)
@@ -27,4 +34,4 @@ cat $REQUEST_FILE
 
 gzip -c $REQUEST_FILE | curl -X POST -H "Content-Type: application/json" \
 -H "Api-Key: $NEW_RELIC_LICENSE_KEY" -H "Content-Encoding: gzip" \
-https://insights-collector.newrelic.com/v1/accounts/$NEW_RELIC_ACCOUNT_ID/events --data-binary @-
+https://${EVENTS_HOST}/v1/accounts/$NEW_RELIC_ACCOUNT_ID/events --data-binary @-

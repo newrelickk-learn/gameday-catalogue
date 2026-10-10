@@ -28,6 +28,14 @@ const wfEventName = 'CIWorkflow';
 const jobEventName = 'CIJob';
 const nrKey = process.env.NR_KEY;
 const nrInsightIngestKey = process.env.NR_II_KEY;
+const nrRegion = (process.env.NEW_RELIC_REGION || 'US').toUpperCase();
+const nrHosts = {
+  US: { nerdgraph: 'api.newrelic.com', events: 'insights-collector.newrelic.com' },
+  JP: { nerdgraph: 'api.jp.newrelic.com', events: 'insights-collector.jp.nr-data.net' }
+}[nrRegion];
+if (!nrHosts) {
+  throw new Error(`Unknown region: ${nrRegion} (use US or JP)`);
+}
 let date = new Date();
 date.setHours(date.getHours()-1);
 const dateStr = `${date.getUTCFullYear()}-${date.getUTCMonth()+1}-${date.getUTCDate()}T${date.getHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}Z`;
@@ -43,7 +51,7 @@ const circleciOpt = {
 };
 const nrOpt = {
   protocol: 'https:',
-  hostname: 'api.newrelic.com',
+  hostname: nrHosts.nerdgraph,
   path: `/graphql`,
   method: 'POST',
   headers:{
@@ -53,7 +61,7 @@ const nrOpt = {
 };
 const nrEventOpt = {
   protocol: 'https:',
-  hostname: 'insights-collector.newrelic.com',
+  hostname: nrHosts.events,
   path: `/v1/accounts/${nrAccount}/events`,
   method: 'POST',
   headers:{
