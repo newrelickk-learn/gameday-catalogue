@@ -167,3 +167,4 @@ jobs:
           hash="${{ github.sha }}"
           sed -i "s/DESCRIPTION/${description}/;s/TAG/${tag_raw}/;s/HASH/${hash}/" scripts/change_tracking.query
           ./scripts/change_tracking.sh ${{ secrets.NEW_RELIC_USER_KEY }} ${{ vars.NEW_RELIC_REGION || 'US' }} ${{ vars.APP_NAME || 'catalogue' }}
+          NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }} NEW_RELIC_ACCOUNT_ID=${{ vars.NEW_RELIC_ACCOUNT_ID }} ./scripts/devops4keys_leadtime.sh ${{ vars.NEW_RELIC_REGION || 'US' }}
