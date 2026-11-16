@@ -105,6 +105,17 @@ jobs:
           --repoUrl=${{ github.server_url }}/${{ github.repository }} \
           --buildCommit=${{ github.sha }}
 
+    - name: Publish sourcemaps to New Relic (JP)
+      if: github.ref_type == 'tag'
+      env:
+        SOURCEMAP_UPLOAD_HOST: https://sourcemaps.service.jp.newrelic.com
+      run: |
+        publish-sourcemap $(ls js/*.js.map) https://catalogue.demo.learn.nrkk.technology/packs/$(ls js/*.js) \
+          --apiKey=${{ secrets.NEW_RELIC_JP_USER_KEY }} \
+          --applicationId=63893 \
+          --repoUrl=${{ github.server_url }}/${{ github.repository }} \
+          --buildCommit=${{ github.sha }}
+
   deploy:
     needs: build
     runs-on: ${{ vars.RUNNER_LABELS || 'ubuntu-latest' }}
