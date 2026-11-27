@@ -30,11 +30,11 @@ async function makeSomeRequest () {
     const user = location.search.split(/(\?|&)/).find(p=>p.startsWith('user')) ?? ''
     for (let i = 0; i < 2; i++) {
         try {
-            await fetch(`/catalogue/size?tags=blue,sport&${user}`)
+            await fetch(`/catalogue/size?tags[]=blue&tags[]=sport&${user}`)
         } catch {}
     }
     try {
-        await fetch(`/catalogue?tags=blue,sport&${user}`)
+        await fetch(`/catalogue?tags[]=blue&tags[]=sport&${user}`)
     } catch {}
 }
 
